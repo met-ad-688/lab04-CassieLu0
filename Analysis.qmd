@@ -1,0 +1,13 @@
+---
+title: "Job Postings Data Analysis"
+author: "Ling Lu"
+format: html
+execute:
+  echo: true
+---
+
+```{python}
+import pandas as pd    # Data manipulation
+import numpy as np     # Numerical computations
+import matplotlib.pyplot as plt  # Plotting
+import seaborn as sns  # Statistical visualization
