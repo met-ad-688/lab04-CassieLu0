@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ling Lu">
+
+<title>Job Postings Data Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="Analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="Analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="Analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Analysis_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Analysis_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Job Postings Data Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ling Lu </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div id="5df12083" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> gdown</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'lightcast_job_postings.csv'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.max_columns"</span>, <span class="va">None</span>)  <span class="co"># Show all columns</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">"display.max_colwidth"</span>, <span class="dv">50</span>) </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df.info()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 72476 entries, 0 to 72475
+Columns: 131 entries, ID to NAICS_2022_6_NAME
+dtypes: bool(2), float64(11), int64(27), object(91)
+memory usage: 71.5+ MB</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">LAST_UPDATED_DATE</th>
+<th data-quarto-table-cell-role="th">LAST_UPDATED_TIMESTAMP</th>
+<th data-quarto-table-cell-role="th">DUPLICATES</th>
+<th data-quarto-table-cell-role="th">POSTED</th>
+<th data-quarto-table-cell-role="th">EXPIRED</th>
+<th data-quarto-table-cell-role="th">DURATION</th>
+<th data-quarto-table-cell-role="th">SOURCE_TYPES</th>
+<th data-quarto-table-cell-role="th">SOURCES</th>
+<th data-quarto-table-cell-role="th">URL</th>
+<th data-quarto-table-cell-role="th">ACTIVE_URLS</th>
+<th data-quarto-table-cell-role="th">ACTIVE_SOURCES_INFO</th>
+<th data-quarto-table-cell-role="th">TITLE_RAW</th>
+<th data-quarto-table-cell-role="th">BODY</th>
+<th data-quarto-table-cell-role="th">MODELED_EXPIRED</th>
+<th data-quarto-table-cell-role="th">MODELED_DURATION</th>
+<th data-quarto-table-cell-role="th">COMPANY</th>
+<th data-quarto-table-cell-role="th">COMPANY_NAME</th>
+<th data-quarto-table-cell-role="th">COMPANY_RAW</th>
+<th data-quarto-table-cell-role="th">COMPANY_IS_STAFFING</th>
+<th data-quarto-table-cell-role="th">EDUCATION_LEVELS</th>
+<th data-quarto-table-cell-role="th">EDUCATION_LEVELS_NAME</th>
+<th data-quarto-table-cell-role="th">MIN_EDULEVELS</th>
+<th data-quarto-table-cell-role="th">MIN_EDULEVELS_NAME</th>
+<th data-quarto-table-cell-role="th">MAX_EDULEVELS</th>
+<th data-quarto-table-cell-role="th">MAX_EDULEVELS_NAME</th>
+<th data-quarto-table-cell-role="th">EMPLOYMENT_TYPE</th>
+<th data-quarto-table-cell-role="th">EMPLOYMENT_TYPE_NAME</th>
+<th data-quarto-table-cell-role="th">MIN_YEARS_EXPERIENCE</th>
+<th data-quarto-table-cell-role="th">MAX_YEARS_EXPERIENCE</th>
+<th data-quarto-table-cell-role="th">IS_INTERNSHIP</th>
+<th data-quarto-table-cell-role="th">SALARY</th>
+<th data-quarto-table-cell-role="th">REMOTE_TYPE</th>
+<th data-quarto-table-cell-role="th">REMOTE_TYPE_NAME</th>
+<th data-quarto-table-cell-role="th">ORIGINAL_PAY_PERIOD</th>
+<th data-quarto-table-cell-role="th">SALARY_TO</th>
+<th data-quarto-table-cell-role="th">SALARY_FROM</th>
+<th data-quarto-table-cell-role="th">LOCATION</th>
+<th data-quarto-table-cell-role="th">CITY</th>
+<th data-quarto-table-cell-role="th">CITY_NAME</th>
+<th data-quarto-table-cell-role="th">COUNTY</th>
+<th data-quarto-table-cell-role="th">COUNTY_NAME</th>
+<th data-quarto-table-cell-role="th">MSA</th>
+<th data-quarto-table-cell-role="th">MSA_NAME</th>
+<th data-quarto-table-cell-role="th">STATE</th>
+<th data-quarto-table-cell-role="th">STATE_NAME</th>
+<th data-quarto-table-cell-role="th">COUNTY_OUTGOING</th>
+<th data-quarto-table-cell-role="th">COUNTY_NAME_OUTGOING</th>
+<th data-quarto-table-cell-role="th">COUNTY_INCOMING</th>
+<th data-quarto-table-cell-role="th">COUNTY_NAME_INCOMING</th>
+<th data-quarto-table-cell-role="th">MSA_OUTGOING</th>
+<th data-quarto-table-cell-role="th">MSA_NAME_OUTGOING</th>
+<th data-quarto-table-cell-role="th">MSA_INCOMING</th>
+<th data-quarto-table-cell-role="th">MSA_NAME_INCOMING</th>
+<th data-quarto-table-cell-role="th">NAICS2</th>
+<th data-quarto-table-cell-role="th">NAICS2_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS3</th>
+<th data-quarto-table-cell-role="th">NAICS3_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS4</th>
+<th data-quarto-table-cell-role="th">NAICS4_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS5</th>
+<th data-quarto-table-cell-role="th">NAICS5_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS6</th>
+<th data-quarto-table-cell-role="th">NAICS6_NAME</th>
+<th data-quarto-table-cell-role="th">TITLE</th>
+<th data-quarto-table-cell-role="th">TITLE_NAME</th>
+<th data-quarto-table-cell-role="th">TITLE_CLEAN</th>
+<th data-quarto-table-cell-role="th">SKILLS</th>
+<th data-quarto-table-cell-role="th">SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">SPECIALIZED_SKILLS</th>
+<th data-quarto-table-cell-role="th">SPECIALIZED_SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">CERTIFICATIONS</th>
+<th data-quarto-table-cell-role="th">CERTIFICATIONS_NAME</th>
+<th data-quarto-table-cell-role="th">COMMON_SKILLS</th>
+<th data-quarto-table-cell-role="th">COMMON_SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">SOFTWARE_SKILLS</th>
+<th data-quarto-table-cell-role="th">SOFTWARE_SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">ONET</th>
+<th data-quarto-table-cell-role="th">ONET_NAME</th>
+<th data-quarto-table-cell-role="th">ONET_2019</th>
+<th data-quarto-table-cell-role="th">ONET_2019_NAME</th>
+<th data-quarto-table-cell-role="th">CIP6</th>
+<th data-quarto-table-cell-role="th">CIP6_NAME</th>
+<th data-quarto-table-cell-role="th">CIP4</th>
+<th data-quarto-table-cell-role="th">CIP4_NAME</th>
+<th data-quarto-table-cell-role="th">CIP2</th>
+<th data-quarto-table-cell-role="th">CIP2_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_2</th>
+<th data-quarto-table-cell-role="th">SOC_2021_2_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_3</th>
+<th data-quarto-table-cell-role="th">SOC_2021_3_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_4</th>
+<th data-quarto-table-cell-role="th">SOC_2021_4_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_5</th>
+<th data-quarto-table-cell-role="th">SOC_2021_5_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_CAREER_AREA</th>
+<th data-quarto-table-cell-role="th">LOT_CAREER_AREA_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_SPECIALIZED_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_SPECIALIZED_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION_GROUP</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION_GROUP_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_SPECIALIZED_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_V6_SPECIALIZED_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION_GROUP</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION_GROUP_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_CAREER_AREA</th>
+<th data-quarto-table-cell-role="th">LOT_V6_CAREER_AREA_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2</th>
+<th data-quarto-table-cell-role="th">SOC_2_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_3</th>
+<th data-quarto-table-cell-role="th">SOC_3_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_4</th>
+<th data-quarto-table-cell-role="th">SOC_4_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_5</th>
+<th data-quarto-table-cell-role="th">SOC_5_NAME</th>
+<th data-quarto-table-cell-role="th">LIGHTCAST_SECTORS</th>
+<th data-quarto-table-cell-role="th">LIGHTCAST_SECTORS_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_2</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_2_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_3</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_3_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_4</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_4_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_5</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_5_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_6</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_6_NAME</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1f57d95acf4dc67ed2819eb12f049f6a5c11782c</td>
+<td>2024-09-06</td>
+<td>2024-09-06 20:32:57.352 Z</td>
+<td>0</td>
+<td>2024-06-02</td>
+<td>2024-06-08</td>
+<td>6.0</td>
+<td>[\n "Company"\n]</td>
+<td>[\n "brassring.com"\n]</td>
+<td>[\n "https://sjobs.brassring.com/TGnewUI/Sear...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Enterprise Analyst (II-III)</td>
+<td>31-May-2024\n\nEnterprise Analyst (II-III)\n\n...</td>
+<td>2024-06-08</td>
+<td>6.0</td>
+<td>894731</td>
+<td>Murphy USA</td>
+<td>Murphy USA</td>
+<td>False</td>
+<td>[\n 2\n]</td>
+<td>[\n "Bachelor's degree"\n]</td>
+<td>2</td>
+<td>Bachelor's degree</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>2.0</td>
+<td>2.0</td>
+<td>False</td>
+<td>NaN</td>
+<td>0</td>
+<td>[None]</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{\n "lat": 33.20763,\n "lon": -92.6662674\n}</td>
+<td>RWwgRG9yYWRvLCBBUg==</td>
+<td>El Dorado, AR</td>
+<td>5139</td>
+<td>Union, AR</td>
+<td>20980.0</td>
+<td>El Dorado, AR</td>
+<td>5</td>
+<td>Arkansas</td>
+<td>5139</td>
+<td>Union, AR</td>
+<td>5139</td>
+<td>Union, AR</td>
+<td>20980.0</td>
+<td>El Dorado, AR</td>
+<td>20980.0</td>
+<td>El Dorado, AR</td>
+<td>44</td>
+<td>Retail Trade</td>
+<td>441</td>
+<td>Motor Vehicle and Parts Dealers</td>
+<td>4413</td>
+<td>Automotive Parts, Accessories, and Tire Retailers</td>
+<td>44133</td>
+<td>Automotive Parts and Accessories Retailers</td>
+<td>441330</td>
+<td>Automotive Parts and Accessories Retailers</td>
+<td>ET29C073C03D1F86B4</td>
+<td>Enterprise Analysts</td>
+<td>enterprise analyst ii iii</td>
+<td>[\n "KS126DB6T061MHD7RTGQ",\n "KS126706DPFD3...</td>
+<td>[\n "Merchandising",\n "Mathematics",\n "Pr...</td>
+<td>[\n "KS126DB6T061MHD7RTGQ",\n "KS128006L3V0H...</td>
+<td>[\n "Merchandising",\n "Predictive Modeling"...</td>
+<td>[]</td>
+<td>[]</td>
+<td>[\n "KS126706DPFD3354M7YK",\n "KS1280B68GD79...</td>
+<td>[\n "Mathematics",\n "Presentations",\n "Re...</td>
+<td>[\n "KS440W865GC4VRBW6LJP",\n "KS13USA80NE38...</td>
+<td>[\n "SQL (Programming Language)",\n "Power B...</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>[\n "45.0601",\n "27.0101"\n]</td>
+<td>[\n "Economics, General",\n "Mathematics, Ge...</td>
+<td>[\n "45.06",\n "27.01"\n]</td>
+<td>[\n "Economics",\n "Mathematics"\n]</td>
+<td>[\n "45",\n "27"\n]</td>
+<td>[\n "Social Sciences",\n "Mathematics and St...</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>23101011</td>
+<td>General ERP Analyst / Consultant</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23101011</td>
+<td>General ERP Analyst / Consultant</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>[\n 7\n]</td>
+<td>[\n "Artificial Intelligence"\n]</td>
+<td>44</td>
+<td>Retail Trade</td>
+<td>441</td>
+<td>Motor Vehicle and Parts Dealers</td>
+<td>4413</td>
+<td>Automotive Parts, Accessories, and Tire Retailers</td>
+<td>44133</td>
+<td>Automotive Parts and Accessories Retailers</td>
+<td>441330</td>
+<td>Automotive Parts and Accessories Retailers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0cb072af26757b6c4ea9464472a50a443af681ac</td>
+<td>2024-08-02</td>
+<td>2024-08-02 17:08:58.838 Z</td>
+<td>0</td>
+<td>2024-06-02</td>
+<td>2024-08-01</td>
+<td>NaN</td>
+<td>[\n "Job Board"\n]</td>
+<td>[\n "maine.gov"\n]</td>
+<td>[\n "https://joblink.maine.gov/jobs/1085740"\n]</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Oracle Consultant - Reports (3592)</td>
+<td>Oracle Consultant - Reports (3592)\n\nat SMX i...</td>
+<td>2024-08-01</td>
+<td>NaN</td>
+<td>133098</td>
+<td>Smx Corporation Limited</td>
+<td>SMX</td>
+<td>True</td>
+<td>[\n 99\n]</td>
+<td>[\n "No Education Listed"\n]</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>3.0</td>
+<td>3.0</td>
+<td>False</td>
+<td>NaN</td>
+<td>1</td>
+<td>Remote</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{\n "lat": 44.3106241,\n "lon": -69.7794897\n}</td>
+<td>QXVndXN0YSwgTUU=</td>
+<td>Augusta, ME</td>
+<td>23011</td>
+<td>Kennebec, ME</td>
+<td>12300.0</td>
+<td>Augusta-Waterville, ME</td>
+<td>23</td>
+<td>Maine</td>
+<td>23011</td>
+<td>Kennebec, ME</td>
+<td>23011</td>
+<td>Kennebec, ME</td>
+<td>12300.0</td>
+<td>Augusta-Waterville, ME</td>
+<td>12300.0</td>
+<td>Augusta-Waterville, ME</td>
+<td>56</td>
+<td>Administrative and Support and Waste Managemen...</td>
+<td>561</td>
+<td>Administrative and Support Services</td>
+<td>5613</td>
+<td>Employment Services</td>
+<td>56132</td>
+<td>Temporary Help Services</td>
+<td>561320</td>
+<td>Temporary Help Services</td>
+<td>ET21DDA63780A7DC09</td>
+<td>Oracle Consultants</td>
+<td>oracle consultant reports</td>
+<td>[\n "KS122626T550SLQ7QZ1C",\n "KS123YJ6KVWC9...</td>
+<td>[\n "Procurement",\n "Financial Statements",...</td>
+<td>[\n "KS122626T550SLQ7QZ1C",\n "KS123YJ6KVWC9...</td>
+<td>[\n "Procurement",\n "Financial Statements",...</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[\n "BGSBF3F508F7F46312E3",\n "ESEA839CED378...</td>
+<td>[\n "Oracle Business Intelligence (BI) / OBIA...</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>56</td>
+<td>Administrative and Support and Waste Managemen...</td>
+<td>561</td>
+<td>Administrative and Support Services</td>
+<td>5613</td>
+<td>Employment Services</td>
+<td>56132</td>
+<td>Temporary Help Services</td>
+<td>561320</td>
+<td>Temporary Help Services</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>85318b12b3331fa490d32ad014379df01855c557</td>
+<td>2024-09-06</td>
+<td>2024-09-06 20:32:57.352 Z</td>
+<td>1</td>
+<td>2024-06-02</td>
+<td>2024-07-07</td>
+<td>35.0</td>
+<td>[\n "Job Board"\n]</td>
+<td>[\n "dejobs.org"\n]</td>
+<td>[\n "https://dejobs.org/dallas-tx/data-analys...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Data Analyst</td>
+<td>Taking care of people is at the heart of every...</td>
+<td>2024-06-10</td>
+<td>8.0</td>
+<td>39063746</td>
+<td>Sedgwick</td>
+<td>Sedgwick</td>
+<td>False</td>
+<td>[\n 2\n]</td>
+<td>[\n "Bachelor's degree"\n]</td>
+<td>2</td>
+<td>Bachelor's degree</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>5.0</td>
+<td>NaN</td>
+<td>False</td>
+<td>NaN</td>
+<td>0</td>
+<td>[None]</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{\n "lat": 32.7766642,\n "lon": -96.7969879\n}</td>
+<td>RGFsbGFzLCBUWA==</td>
+<td>Dallas, TX</td>
+<td>48113</td>
+<td>Dallas, TX</td>
+<td>19100.0</td>
+<td>Dallas-Fort Worth-Arlington, TX</td>
+<td>48</td>
+<td>Texas</td>
+<td>48113</td>
+<td>Dallas, TX</td>
+<td>48113</td>
+<td>Dallas, TX</td>
+<td>19100.0</td>
+<td>Dallas-Fort Worth-Arlington, TX</td>
+<td>19100.0</td>
+<td>Dallas-Fort Worth-Arlington, TX</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>524</td>
+<td>Insurance Carriers and Related Activities</td>
+<td>5242</td>
+<td>Agencies, Brokerages, and Other Insurance Rela...</td>
+<td>52429</td>
+<td>Other Insurance Related Activities</td>
+<td>524291</td>
+<td>Claims Adjusting</td>
+<td>ET3037E0C947A02404</td>
+<td>Data Analysts</td>
+<td>data analyst</td>
+<td>[\n "KS1218W78FGVPVP2KXPX",\n "ESF3939CE1F80...</td>
+<td>[\n "Management",\n "Exception Reporting",\n...</td>
+<td>[\n "ESF3939CE1F80C10C327",\n "KS120GV6C72JM...</td>
+<td>[\n "Exception Reporting",\n "Data Analysis"...</td>
+<td>[\n "KS683TN76T77DQDVBZ1B"\n]</td>
+<td>[\n "Security Clearance"\n]</td>
+<td>[\n "KS1218W78FGVPVP2KXPX",\n "BGS1ADAA36DB6...</td>
+<td>[\n "Management",\n "Report Writing",\n "In...</td>
+<td>[\n "KS126HY6YLTB9R7XJC4Z"\n]</td>
+<td>[\n "Microsoft Office"\n]</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>524</td>
+<td>Insurance Carriers and Related Activities</td>
+<td>5242</td>
+<td>Agencies, Brokerages, and Other Insurance Rela...</td>
+<td>52429</td>
+<td>Other Insurance Related Activities</td>
+<td>524291</td>
+<td>Claims Adjusting</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1b5c3941e54a1889ef4f8ae55b401a550708a310</td>
+<td>2024-09-06</td>
+<td>2024-09-06 20:32:57.352 Z</td>
+<td>1</td>
+<td>2024-06-02</td>
+<td>2024-07-20</td>
+<td>48.0</td>
+<td>[\n "Job Board"\n]</td>
+<td>[\n "disabledperson.com",\n "dejobs.org"\n]</td>
+<td>[\n "https://www.disabledperson.com/jobs/5948...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Sr. Lead Data Mgmt. Analyst - SAS Product Owner</td>
+<td>About this role:\n\nWells Fargo is looking for...</td>
+<td>2024-06-12</td>
+<td>10.0</td>
+<td>37615159</td>
+<td>Wells Fargo</td>
+<td>Wells Fargo</td>
+<td>False</td>
+<td>[\n 99\n]</td>
+<td>[\n "No Education Listed"\n]</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>3.0</td>
+<td>NaN</td>
+<td>False</td>
+<td>NaN</td>
+<td>0</td>
+<td>[None]</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{\n "lat": 33.4483771,\n "lon": -112.0740373\n}</td>
+<td>UGhvZW5peCwgQVo=</td>
+<td>Phoenix, AZ</td>
+<td>4013</td>
+<td>Maricopa, AZ</td>
+<td>38060.0</td>
+<td>Phoenix-Mesa-Chandler, AZ</td>
+<td>4</td>
+<td>Arizona</td>
+<td>4013</td>
+<td>Maricopa, AZ</td>
+<td>4013</td>
+<td>Maricopa, AZ</td>
+<td>38060.0</td>
+<td>Phoenix-Mesa-Chandler, AZ</td>
+<td>38060.0</td>
+<td>Phoenix-Mesa-Chandler, AZ</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>522</td>
+<td>Credit Intermediation and Related Activities</td>
+<td>5221</td>
+<td>Depository Credit Intermediation</td>
+<td>52211</td>
+<td>Commercial Banking</td>
+<td>522110</td>
+<td>Commercial Banking</td>
+<td>ET2114E0404BA30075</td>
+<td>Management Analysts</td>
+<td>sr lead data mgmt analyst sas product owner</td>
+<td>[\n "KS123QX62QYTC4JF38H8",\n "KS7G6NP6R6L1H...</td>
+<td>[\n "Exit Strategies",\n "Reliability",\n "...</td>
+<td>[\n "KS123QX62QYTC4JF38H8",\n "KS441PQ64HT13...</td>
+<td>[\n "Exit Strategies",\n "User Story",\n "H...</td>
+<td>[]</td>
+<td>[]</td>
+<td>[\n "KS7G6NP6R6L1H1SKFTSY",\n "KS1218W78FGVP...</td>
+<td>[\n "Reliability",\n "Management",\n "Strat...</td>
+<td>[\n "KS4409D76NW1S5LNCL18",\n "ESC7869CF7378...</td>
+<td>[\n "SAS (Software)",\n "Google Cloud Platfo...</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>[\n 6\n]</td>
+<td>[\n "Data Privacy/Protection"\n]</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>522</td>
+<td>Credit Intermediation and Related Activities</td>
+<td>5221</td>
+<td>Depository Credit Intermediation</td>
+<td>52211</td>
+<td>Commercial Banking</td>
+<td>522110</td>
+<td>Commercial Banking</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>cb5ca25f02bdf25c13edfede7931508bfd9e858f</td>
+<td>2024-06-19</td>
+<td>2024-06-19 07:00:00.000 Z</td>
+<td>0</td>
+<td>2024-06-02</td>
+<td>2024-06-17</td>
+<td>15.0</td>
+<td>[\n "FreeJobBoard"\n]</td>
+<td>[\n "craigslist.org"\n]</td>
+<td>[\n "https://modesto.craigslist.org/sls/77475...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Comisiones de $1000 - $3000 por semana... Comi...</td>
+<td>Comisiones de $1000 - $3000 por semana... Comi...</td>
+<td>2024-06-17</td>
+<td>15.0</td>
+<td>0</td>
+<td>Unclassified</td>
+<td>LH/GM</td>
+<td>False</td>
+<td>[\n 99\n]</td>
+<td>[\n "No Education Listed"\n]</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>3</td>
+<td>Part-time / full-time</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>False</td>
+<td>92500.0</td>
+<td>0</td>
+<td>[None]</td>
+<td>year</td>
+<td>150000.0</td>
+<td>35000.0</td>
+<td>{\n "lat": 37.6392595,\n "lon": -120.9970014\n}</td>
+<td>TW9kZXN0bywgQ0E=</td>
+<td>Modesto, CA</td>
+<td>6099</td>
+<td>Stanislaus, CA</td>
+<td>33700.0</td>
+<td>Modesto, CA</td>
+<td>6</td>
+<td>California</td>
+<td>6099</td>
+<td>Stanislaus, CA</td>
+<td>6099</td>
+<td>Stanislaus, CA</td>
+<td>33700.0</td>
+<td>Modesto, CA</td>
+<td>33700.0</td>
+<td>Modesto, CA</td>
+<td>99</td>
+<td>Unclassified Industry</td>
+<td>999</td>
+<td>Unclassified Industry</td>
+<td>9999</td>
+<td>Unclassified Industry</td>
+<td>99999</td>
+<td>Unclassified Industry</td>
+<td>999999</td>
+<td>Unclassified Industry</td>
+<td>ET0000000000000000</td>
+<td>Unclassified</td>
+<td>comisiones de por semana comiensa rapido</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>99</td>
+<td>Unclassified Industry</td>
+<td>999</td>
+<td>Unclassified Industry</td>
+<td>9999</td>
+<td>Unclassified Industry</td>
+<td>99999</td>
+<td>Unclassified Industry</td>
+<td>999999</td>
+<td>Unclassified Industry</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="85ea1d64" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Data Cleaning and Preprocessing</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a copy to prevent chained assignment warning</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.copy()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove duplicates</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop_duplicates()</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Handle missing values safely</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"DURATION"</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"DURATION"</span>] <span class="op">=</span> df[<span class="st">"DURATION"</span>].fillna(df[<span class="st">"DURATION"</span>].median())</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>salary_columns <span class="op">=</span> [<span class="st">"SALARY"</span>]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace missing salary values with the median salary for each column</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> salary_columns:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="kw">in</span> df.columns:</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        df[col] <span class="op">=</span> df[col].fillna(df[col].median())</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert date columns to datetime format</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>date_columns <span class="op">=</span> [<span class="st">"LAST_UPDATED_DATE"</span>, <span class="st">"POSTED"</span>, <span class="st">"EXPIRED"</span>]</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> date_columns:</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="kw">in</span> df.columns:</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        df[col] <span class="op">=</span> pd.to_datetime(df[col], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean text columns</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>list_columns <span class="op">=</span> [<span class="st">"SOURCES"</span>, <span class="st">"SOURCE_TYPES"</span>, <span class="st">"URL"</span>,<span class="st">"EDUCATION_LEVELS_NAME"</span>,<span class="st">"EDUCATION_LEVELS"</span>,<span class="st">"LOCATION"</span>,<span class="st">"SKILLS"</span>,<span class="st">"SKILLS_NAME"</span>,<span class="st">"SPECIALIZED_SKILLS"</span>,<span class="st">"SPECIALIZED_SKILLS_NAME"</span>,<span class="st">"COMMON_SKILLS"</span>,</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="st">"COMMON_SKILLS_NAME"</span>,<span class="st">"SOFTWARE_SKILLS"</span>,<span class="st">"SOFTWARE_SKILLS_NAME"</span>,<span class="st">"CIP6"</span>,<span class="st">"CIP6_NAME"</span>,<span class="st">"CIP4"</span>,<span class="st">"CIP4_NAME"</span>,<span class="st">"CIP2"</span>,<span class="st">"CIP2_NAME"</span>]</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> list_columns:</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="kw">in</span> df.columns:</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        df[col] <span class="op">=</span> df[col].astype(<span class="bu">str</span>).<span class="bu">str</span>.replace(<span class="vs">r"[\[\]\n\"]"</span>, <span class="st">""</span>, regex<span class="op">=</span><span class="va">True</span>).<span class="bu">str</span>.strip()</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the cleaned dataset</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>cleaned_file <span class="op">=</span> <span class="st">"cleaned_lightcast_job_postings.csv"</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>df.to_csv(cleaned_file, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss"> Cleaned dataset saved as '</span><span class="sc">{</span>cleaned_file<span class="sc">}</span><span class="ss">'"</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>df.head() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Cleaned dataset saved as 'cleaned_lightcast_job_postings.csv'</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">LAST_UPDATED_DATE</th>
+<th data-quarto-table-cell-role="th">LAST_UPDATED_TIMESTAMP</th>
+<th data-quarto-table-cell-role="th">DUPLICATES</th>
+<th data-quarto-table-cell-role="th">POSTED</th>
+<th data-quarto-table-cell-role="th">EXPIRED</th>
+<th data-quarto-table-cell-role="th">DURATION</th>
+<th data-quarto-table-cell-role="th">SOURCE_TYPES</th>
+<th data-quarto-table-cell-role="th">SOURCES</th>
+<th data-quarto-table-cell-role="th">URL</th>
+<th data-quarto-table-cell-role="th">ACTIVE_URLS</th>
+<th data-quarto-table-cell-role="th">ACTIVE_SOURCES_INFO</th>
+<th data-quarto-table-cell-role="th">TITLE_RAW</th>
+<th data-quarto-table-cell-role="th">BODY</th>
+<th data-quarto-table-cell-role="th">MODELED_EXPIRED</th>
+<th data-quarto-table-cell-role="th">MODELED_DURATION</th>
+<th data-quarto-table-cell-role="th">COMPANY</th>
+<th data-quarto-table-cell-role="th">COMPANY_NAME</th>
+<th data-quarto-table-cell-role="th">COMPANY_RAW</th>
+<th data-quarto-table-cell-role="th">COMPANY_IS_STAFFING</th>
+<th data-quarto-table-cell-role="th">EDUCATION_LEVELS</th>
+<th data-quarto-table-cell-role="th">EDUCATION_LEVELS_NAME</th>
+<th data-quarto-table-cell-role="th">MIN_EDULEVELS</th>
+<th data-quarto-table-cell-role="th">MIN_EDULEVELS_NAME</th>
+<th data-quarto-table-cell-role="th">MAX_EDULEVELS</th>
+<th data-quarto-table-cell-role="th">MAX_EDULEVELS_NAME</th>
+<th data-quarto-table-cell-role="th">EMPLOYMENT_TYPE</th>
+<th data-quarto-table-cell-role="th">EMPLOYMENT_TYPE_NAME</th>
+<th data-quarto-table-cell-role="th">MIN_YEARS_EXPERIENCE</th>
+<th data-quarto-table-cell-role="th">MAX_YEARS_EXPERIENCE</th>
+<th data-quarto-table-cell-role="th">IS_INTERNSHIP</th>
+<th data-quarto-table-cell-role="th">SALARY</th>
+<th data-quarto-table-cell-role="th">REMOTE_TYPE</th>
+<th data-quarto-table-cell-role="th">REMOTE_TYPE_NAME</th>
+<th data-quarto-table-cell-role="th">ORIGINAL_PAY_PERIOD</th>
+<th data-quarto-table-cell-role="th">SALARY_TO</th>
+<th data-quarto-table-cell-role="th">SALARY_FROM</th>
+<th data-quarto-table-cell-role="th">LOCATION</th>
+<th data-quarto-table-cell-role="th">CITY</th>
+<th data-quarto-table-cell-role="th">CITY_NAME</th>
+<th data-quarto-table-cell-role="th">COUNTY</th>
+<th data-quarto-table-cell-role="th">COUNTY_NAME</th>
+<th data-quarto-table-cell-role="th">MSA</th>
+<th data-quarto-table-cell-role="th">MSA_NAME</th>
+<th data-quarto-table-cell-role="th">STATE</th>
+<th data-quarto-table-cell-role="th">STATE_NAME</th>
+<th data-quarto-table-cell-role="th">COUNTY_OUTGOING</th>
+<th data-quarto-table-cell-role="th">COUNTY_NAME_OUTGOING</th>
+<th data-quarto-table-cell-role="th">COUNTY_INCOMING</th>
+<th data-quarto-table-cell-role="th">COUNTY_NAME_INCOMING</th>
+<th data-quarto-table-cell-role="th">MSA_OUTGOING</th>
+<th data-quarto-table-cell-role="th">MSA_NAME_OUTGOING</th>
+<th data-quarto-table-cell-role="th">MSA_INCOMING</th>
+<th data-quarto-table-cell-role="th">MSA_NAME_INCOMING</th>
+<th data-quarto-table-cell-role="th">NAICS2</th>
+<th data-quarto-table-cell-role="th">NAICS2_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS3</th>
+<th data-quarto-table-cell-role="th">NAICS3_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS4</th>
+<th data-quarto-table-cell-role="th">NAICS4_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS5</th>
+<th data-quarto-table-cell-role="th">NAICS5_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS6</th>
+<th data-quarto-table-cell-role="th">NAICS6_NAME</th>
+<th data-quarto-table-cell-role="th">TITLE</th>
+<th data-quarto-table-cell-role="th">TITLE_NAME</th>
+<th data-quarto-table-cell-role="th">TITLE_CLEAN</th>
+<th data-quarto-table-cell-role="th">SKILLS</th>
+<th data-quarto-table-cell-role="th">SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">SPECIALIZED_SKILLS</th>
+<th data-quarto-table-cell-role="th">SPECIALIZED_SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">CERTIFICATIONS</th>
+<th data-quarto-table-cell-role="th">CERTIFICATIONS_NAME</th>
+<th data-quarto-table-cell-role="th">COMMON_SKILLS</th>
+<th data-quarto-table-cell-role="th">COMMON_SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">SOFTWARE_SKILLS</th>
+<th data-quarto-table-cell-role="th">SOFTWARE_SKILLS_NAME</th>
+<th data-quarto-table-cell-role="th">ONET</th>
+<th data-quarto-table-cell-role="th">ONET_NAME</th>
+<th data-quarto-table-cell-role="th">ONET_2019</th>
+<th data-quarto-table-cell-role="th">ONET_2019_NAME</th>
+<th data-quarto-table-cell-role="th">CIP6</th>
+<th data-quarto-table-cell-role="th">CIP6_NAME</th>
+<th data-quarto-table-cell-role="th">CIP4</th>
+<th data-quarto-table-cell-role="th">CIP4_NAME</th>
+<th data-quarto-table-cell-role="th">CIP2</th>
+<th data-quarto-table-cell-role="th">CIP2_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_2</th>
+<th data-quarto-table-cell-role="th">SOC_2021_2_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_3</th>
+<th data-quarto-table-cell-role="th">SOC_2021_3_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_4</th>
+<th data-quarto-table-cell-role="th">SOC_2021_4_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2021_5</th>
+<th data-quarto-table-cell-role="th">SOC_2021_5_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_CAREER_AREA</th>
+<th data-quarto-table-cell-role="th">LOT_CAREER_AREA_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_SPECIALIZED_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_SPECIALIZED_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION_GROUP</th>
+<th data-quarto-table-cell-role="th">LOT_OCCUPATION_GROUP_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_SPECIALIZED_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_V6_SPECIALIZED_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION_GROUP</th>
+<th data-quarto-table-cell-role="th">LOT_V6_OCCUPATION_GROUP_NAME</th>
+<th data-quarto-table-cell-role="th">LOT_V6_CAREER_AREA</th>
+<th data-quarto-table-cell-role="th">LOT_V6_CAREER_AREA_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_2</th>
+<th data-quarto-table-cell-role="th">SOC_2_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_3</th>
+<th data-quarto-table-cell-role="th">SOC_3_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_4</th>
+<th data-quarto-table-cell-role="th">SOC_4_NAME</th>
+<th data-quarto-table-cell-role="th">SOC_5</th>
+<th data-quarto-table-cell-role="th">SOC_5_NAME</th>
+<th data-quarto-table-cell-role="th">LIGHTCAST_SECTORS</th>
+<th data-quarto-table-cell-role="th">LIGHTCAST_SECTORS_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_2</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_2_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_3</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_3_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_4</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_4_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_5</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_5_NAME</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_6</th>
+<th data-quarto-table-cell-role="th">NAICS_2022_6_NAME</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1f57d95acf4dc67ed2819eb12f049f6a5c11782c</td>
+<td>2024-09-06</td>
+<td>2024-09-06 20:32:57.352 Z</td>
+<td>0</td>
+<td>2024-06-02</td>
+<td>2024-06-08</td>
+<td>6.0</td>
+<td>Company</td>
+<td>brassring.com</td>
+<td>https://sjobs.brassring.com/TGnewUI/Search/hom...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Enterprise Analyst (II-III)</td>
+<td>31-May-2024\n\nEnterprise Analyst (II-III)\n\n...</td>
+<td>2024-06-08</td>
+<td>6.0</td>
+<td>894731</td>
+<td>Murphy USA</td>
+<td>Murphy USA</td>
+<td>False</td>
+<td>2</td>
+<td>Bachelor's degree</td>
+<td>2</td>
+<td>Bachelor's degree</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>2.0</td>
+<td>2.0</td>
+<td>False</td>
+<td>116348.5</td>
+<td>0</td>
+<td>[None]</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{ lat: 33.20763, lon: -92.6662674}</td>
+<td>RWwgRG9yYWRvLCBBUg==</td>
+<td>El Dorado, AR</td>
+<td>5139</td>
+<td>Union, AR</td>
+<td>20980.0</td>
+<td>El Dorado, AR</td>
+<td>5</td>
+<td>Arkansas</td>
+<td>5139</td>
+<td>Union, AR</td>
+<td>5139</td>
+<td>Union, AR</td>
+<td>20980.0</td>
+<td>El Dorado, AR</td>
+<td>20980.0</td>
+<td>El Dorado, AR</td>
+<td>44</td>
+<td>Retail Trade</td>
+<td>441</td>
+<td>Motor Vehicle and Parts Dealers</td>
+<td>4413</td>
+<td>Automotive Parts, Accessories, and Tire Retailers</td>
+<td>44133</td>
+<td>Automotive Parts and Accessories Retailers</td>
+<td>441330</td>
+<td>Automotive Parts and Accessories Retailers</td>
+<td>ET29C073C03D1F86B4</td>
+<td>Enterprise Analysts</td>
+<td>enterprise analyst ii iii</td>
+<td>KS126DB6T061MHD7RTGQ, KS126706DPFD3354M7YK, ...</td>
+<td>Merchandising, Mathematics, Presentations, ...</td>
+<td>KS126DB6T061MHD7RTGQ, KS128006L3V0HM2B26N5, ...</td>
+<td>Merchandising, Predictive Modeling, Data Mod...</td>
+<td>[]</td>
+<td>[]</td>
+<td>KS126706DPFD3354M7YK, KS1280B68GD79P4WMVYW, ...</td>
+<td>Mathematics, Presentations, Report Writing, ...</td>
+<td>KS440W865GC4VRBW6LJP, KS13USA80NE38XJHA2TL</td>
+<td>SQL (Programming Language), Power BI</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>45.0601, 27.0101</td>
+<td>Economics, General, Mathematics, General</td>
+<td>45.06, 27.01</td>
+<td>Economics, Mathematics</td>
+<td>45, 27</td>
+<td>Social Sciences, Mathematics and Statistics</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>23101011</td>
+<td>General ERP Analyst / Consultant</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23101011</td>
+<td>General ERP Analyst / Consultant</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>[\n 7\n]</td>
+<td>[\n "Artificial Intelligence"\n]</td>
+<td>44</td>
+<td>Retail Trade</td>
+<td>441</td>
+<td>Motor Vehicle and Parts Dealers</td>
+<td>4413</td>
+<td>Automotive Parts, Accessories, and Tire Retailers</td>
+<td>44133</td>
+<td>Automotive Parts and Accessories Retailers</td>
+<td>441330</td>
+<td>Automotive Parts and Accessories Retailers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0cb072af26757b6c4ea9464472a50a443af681ac</td>
+<td>2024-08-02</td>
+<td>2024-08-02 17:08:58.838 Z</td>
+<td>0</td>
+<td>2024-06-02</td>
+<td>2024-08-01</td>
+<td>18.0</td>
+<td>Job Board</td>
+<td>maine.gov</td>
+<td>https://joblink.maine.gov/jobs/1085740</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Oracle Consultant - Reports (3592)</td>
+<td>Oracle Consultant - Reports (3592)\n\nat SMX i...</td>
+<td>2024-08-01</td>
+<td>NaN</td>
+<td>133098</td>
+<td>Smx Corporation Limited</td>
+<td>SMX</td>
+<td>True</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>3.0</td>
+<td>3.0</td>
+<td>False</td>
+<td>116348.5</td>
+<td>1</td>
+<td>Remote</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{ lat: 44.3106241, lon: -69.7794897}</td>
+<td>QXVndXN0YSwgTUU=</td>
+<td>Augusta, ME</td>
+<td>23011</td>
+<td>Kennebec, ME</td>
+<td>12300.0</td>
+<td>Augusta-Waterville, ME</td>
+<td>23</td>
+<td>Maine</td>
+<td>23011</td>
+<td>Kennebec, ME</td>
+<td>23011</td>
+<td>Kennebec, ME</td>
+<td>12300.0</td>
+<td>Augusta-Waterville, ME</td>
+<td>12300.0</td>
+<td>Augusta-Waterville, ME</td>
+<td>56</td>
+<td>Administrative and Support and Waste Managemen...</td>
+<td>561</td>
+<td>Administrative and Support Services</td>
+<td>5613</td>
+<td>Employment Services</td>
+<td>56132</td>
+<td>Temporary Help Services</td>
+<td>561320</td>
+<td>Temporary Help Services</td>
+<td>ET21DDA63780A7DC09</td>
+<td>Oracle Consultants</td>
+<td>oracle consultant reports</td>
+<td>KS122626T550SLQ7QZ1C, KS123YJ6KVWC91BTMB4R, ...</td>
+<td>Procurement, Financial Statements, Oracle Bu...</td>
+<td>KS122626T550SLQ7QZ1C, KS123YJ6KVWC91BTMB4R, ...</td>
+<td>Procurement, Financial Statements, Oracle Bu...</td>
+<td>[]</td>
+<td>[]</td>
+<td></td>
+<td></td>
+<td>BGSBF3F508F7F46312E3, ESEA839CED37833AA298, ...</td>
+<td>Oracle Business Intelligence (BI) / OBIA, Ora...</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>56</td>
+<td>Administrative and Support and Waste Managemen...</td>
+<td>561</td>
+<td>Administrative and Support Services</td>
+<td>5613</td>
+<td>Employment Services</td>
+<td>56132</td>
+<td>Temporary Help Services</td>
+<td>561320</td>
+<td>Temporary Help Services</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>85318b12b3331fa490d32ad014379df01855c557</td>
+<td>2024-09-06</td>
+<td>2024-09-06 20:32:57.352 Z</td>
+<td>1</td>
+<td>2024-06-02</td>
+<td>2024-07-07</td>
+<td>35.0</td>
+<td>Job Board</td>
+<td>dejobs.org</td>
+<td>https://dejobs.org/dallas-tx/data-analyst/AB20...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Data Analyst</td>
+<td>Taking care of people is at the heart of every...</td>
+<td>2024-06-10</td>
+<td>8.0</td>
+<td>39063746</td>
+<td>Sedgwick</td>
+<td>Sedgwick</td>
+<td>False</td>
+<td>2</td>
+<td>Bachelor's degree</td>
+<td>2</td>
+<td>Bachelor's degree</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>5.0</td>
+<td>NaN</td>
+<td>False</td>
+<td>116348.5</td>
+<td>0</td>
+<td>[None]</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{ lat: 32.7766642, lon: -96.7969879}</td>
+<td>RGFsbGFzLCBUWA==</td>
+<td>Dallas, TX</td>
+<td>48113</td>
+<td>Dallas, TX</td>
+<td>19100.0</td>
+<td>Dallas-Fort Worth-Arlington, TX</td>
+<td>48</td>
+<td>Texas</td>
+<td>48113</td>
+<td>Dallas, TX</td>
+<td>48113</td>
+<td>Dallas, TX</td>
+<td>19100.0</td>
+<td>Dallas-Fort Worth-Arlington, TX</td>
+<td>19100.0</td>
+<td>Dallas-Fort Worth-Arlington, TX</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>524</td>
+<td>Insurance Carriers and Related Activities</td>
+<td>5242</td>
+<td>Agencies, Brokerages, and Other Insurance Rela...</td>
+<td>52429</td>
+<td>Other Insurance Related Activities</td>
+<td>524291</td>
+<td>Claims Adjusting</td>
+<td>ET3037E0C947A02404</td>
+<td>Data Analysts</td>
+<td>data analyst</td>
+<td>KS1218W78FGVPVP2KXPX, ESF3939CE1F80C10C327, ...</td>
+<td>Management, Exception Reporting, Report Writ...</td>
+<td>ESF3939CE1F80C10C327, KS120GV6C72JMSZKMTD7, ...</td>
+<td>Exception Reporting, Data Analysis, Data Int...</td>
+<td>[\n "KS683TN76T77DQDVBZ1B"\n]</td>
+<td>[\n "Security Clearance"\n]</td>
+<td>KS1218W78FGVPVP2KXPX, BGS1ADAA36DB65721AA3, ...</td>
+<td>Management, Report Writing, Interpersonal Co...</td>
+<td>KS126HY6YLTB9R7XJC4Z</td>
+<td>Microsoft Office</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>524</td>
+<td>Insurance Carriers and Related Activities</td>
+<td>5242</td>
+<td>Agencies, Brokerages, and Other Insurance Rela...</td>
+<td>52429</td>
+<td>Other Insurance Related Activities</td>
+<td>524291</td>
+<td>Claims Adjusting</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1b5c3941e54a1889ef4f8ae55b401a550708a310</td>
+<td>2024-09-06</td>
+<td>2024-09-06 20:32:57.352 Z</td>
+<td>1</td>
+<td>2024-06-02</td>
+<td>2024-07-20</td>
+<td>48.0</td>
+<td>Job Board</td>
+<td>disabledperson.com, dejobs.org</td>
+<td>https://www.disabledperson.com/jobs/59489810-s...</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Sr. Lead Data Mgmt. Analyst - SAS Product Owner</td>
+<td>About this role:\n\nWells Fargo is looking for...</td>
+<td>2024-06-12</td>
+<td>10.0</td>
+<td>37615159</td>
+<td>Wells Fargo</td>
+<td>Wells Fargo</td>
+<td>False</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1</td>
+<td>Full-time (&gt; 32 hours)</td>
+<td>3.0</td>
+<td>NaN</td>
+<td>False</td>
+<td>116348.5</td>
+<td>0</td>
+<td>[None]</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>{ lat: 33.4483771, lon: -112.0740373}</td>
+<td>UGhvZW5peCwgQVo=</td>
+<td>Phoenix, AZ</td>
+<td>4013</td>
+<td>Maricopa, AZ</td>
+<td>38060.0</td>
+<td>Phoenix-Mesa-Chandler, AZ</td>
+<td>4</td>
+<td>Arizona</td>
+<td>4013</td>
+<td>Maricopa, AZ</td>
+<td>4013</td>
+<td>Maricopa, AZ</td>
+<td>38060.0</td>
+<td>Phoenix-Mesa-Chandler, AZ</td>
+<td>38060.0</td>
+<td>Phoenix-Mesa-Chandler, AZ</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>522</td>
+<td>Credit Intermediation and Related Activities</td>
+<td>5221</td>
+<td>Depository Credit Intermediation</td>
+<td>52211</td>
+<td>Commercial Banking</td>
+<td>522110</td>
+<td>Commercial Banking</td>
+<td>ET2114E0404BA30075</td>
+<td>Management Analysts</td>
+<td>sr lead data mgmt analyst sas product owner</td>
+<td>KS123QX62QYTC4JF38H8, KS7G6NP6R6L1H1SKFTSY, ...</td>
+<td>Exit Strategies, Reliability, User Story, M...</td>
+<td>KS123QX62QYTC4JF38H8, KS441PQ64HT13P34T8T5, ...</td>
+<td>Exit Strategies, User Story, Hardware Config...</td>
+<td>[]</td>
+<td>[]</td>
+<td>KS7G6NP6R6L1H1SKFTSY, KS1218W78FGVPVP2KXPX, ...</td>
+<td>Reliability, Management, Strategic Planning,...</td>
+<td>KS4409D76NW1S5LNCL18, ESC7869CF7378283E0AA</td>
+<td>SAS (Software), Google Cloud Platform (GCP)</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23111310</td>
+<td>Data Analyst</td>
+<td>231113</td>
+<td>Data / Data Mining Analyst</td>
+<td>2311</td>
+<td>Data Analysis and Mathematics</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>[\n 6\n]</td>
+<td>[\n "Data Privacy/Protection"\n]</td>
+<td>52</td>
+<td>Finance and Insurance</td>
+<td>522</td>
+<td>Credit Intermediation and Related Activities</td>
+<td>5221</td>
+<td>Depository Credit Intermediation</td>
+<td>52211</td>
+<td>Commercial Banking</td>
+<td>522110</td>
+<td>Commercial Banking</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>cb5ca25f02bdf25c13edfede7931508bfd9e858f</td>
+<td>2024-06-19</td>
+<td>2024-06-19 07:00:00.000 Z</td>
+<td>0</td>
+<td>2024-06-02</td>
+<td>2024-06-17</td>
+<td>15.0</td>
+<td>FreeJobBoard</td>
+<td>craigslist.org</td>
+<td>https://modesto.craigslist.org/sls/7747584269....</td>
+<td>[]</td>
+<td>NaN</td>
+<td>Comisiones de $1000 - $3000 por semana... Comi...</td>
+<td>Comisiones de $1000 - $3000 por semana... Comi...</td>
+<td>2024-06-17</td>
+<td>15.0</td>
+<td>0</td>
+<td>Unclassified</td>
+<td>LH/GM</td>
+<td>False</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>99</td>
+<td>No Education Listed</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>3</td>
+<td>Part-time / full-time</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>False</td>
+<td>92500.0</td>
+<td>0</td>
+<td>[None]</td>
+<td>year</td>
+<td>150000.0</td>
+<td>35000.0</td>
+<td>{ lat: 37.6392595, lon: -120.9970014}</td>
+<td>TW9kZXN0bywgQ0E=</td>
+<td>Modesto, CA</td>
+<td>6099</td>
+<td>Stanislaus, CA</td>
+<td>33700.0</td>
+<td>Modesto, CA</td>
+<td>6</td>
+<td>California</td>
+<td>6099</td>
+<td>Stanislaus, CA</td>
+<td>6099</td>
+<td>Stanislaus, CA</td>
+<td>33700.0</td>
+<td>Modesto, CA</td>
+<td>33700.0</td>
+<td>Modesto, CA</td>
+<td>99</td>
+<td>Unclassified Industry</td>
+<td>999</td>
+<td>Unclassified Industry</td>
+<td>9999</td>
+<td>Unclassified Industry</td>
+<td>99999</td>
+<td>Unclassified Industry</td>
+<td>999999</td>
+<td>Unclassified Industry</td>
+<td>ET0000000000000000</td>
+<td>Unclassified</td>
+<td>comisiones de por semana comiensa rapido</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>[]</td>
+<td>[]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td>15-2051.01</td>
+<td>Business Intelligence Analysts</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23101012</td>
+<td>Oracle Consultant / Analyst</td>
+<td>231010</td>
+<td>Business Intelligence Analyst</td>
+<td>2310</td>
+<td>Business Intelligence</td>
+<td>23</td>
+<td>Information Technology and Computer Science</td>
+<td>15-0000</td>
+<td>Computer and Mathematical Occupations</td>
+<td>15-2000</td>
+<td>Mathematical Science Occupations</td>
+<td>15-2050</td>
+<td>Data Scientists</td>
+<td>15-2051</td>
+<td>Data Scientists</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>99</td>
+<td>Unclassified Industry</td>
+<td>999</td>
+<td>Unclassified Industry</td>
+<td>9999</td>
+<td>Unclassified Industry</td>
+<td>99999</td>
+<td>Unclassified Industry</td>
+<td>999999</td>
+<td>Unclassified Industry</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="47b49b20" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  Step 4: Exploratory Data Analysis (EDA)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 4.1 Count Total Job Postings</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>total_postings <span class="op">=</span> df.shape[<span class="dv">0</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss"> Total Job Postings: </span><span class="sc">{</span>total_postings<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 4.2 Find Top 5 Job Titles</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"TITLE_NAME"</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    top_job_titles <span class="op">=</span> df[<span class="st">"TITLE_NAME"</span>].value_counts().head(<span class="dv">5</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> Top 5 Most Common Job Titles:"</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(top_job_titles)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> 'TITLE_NAME' column is missing."</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 4.3 Calculate Average Salary by Employment Type</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Average Salary by Employment Type</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"EMPLOYMENT_TYPE_NAME"</span> <span class="kw">in</span> df.columns <span class="kw">and</span> <span class="st">"SALARY"</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    avg_salary_by_type <span class="op">=</span> df.groupby(<span class="st">"EMPLOYMENT_TYPE_NAME"</span>)[<span class="st">"SALARY"</span>].mean()</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> Average Salary by Employment Type:"</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(avg_salary_by_type)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> 'SALARY' or 'EMPLOYMENT_TYPE_NAME' column is missing."</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 4.4 Find the State with the Most Job Postings</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"STATE_NAME"</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    top_state <span class="op">=</span> df[<span class="st">"STATE_NAME"</span>].value_counts().idxmax()</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss"> State with the Most Job Postings: </span><span class="sc">{</span>top_state<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st"> 'STATE_NAME' column is missing."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Total Job Postings: 72476
+
+ Top 5 Most Common Job Titles:
+TITLE_NAME
+Data Analysts                     8593
+Unclassified                      3151
+Business Intelligence Analysts    2074
+Enterprise Architects             1999
+Oracle Cloud HCM Consultants      1042
+Name: count, dtype: int64
+
+ Average Salary by Employment Type:
+EMPLOYMENT_TYPE_NAME
+Full-time (&gt; 32 hours)    117422.998085
+Part-time (≤ 32 hours)    108423.026545
+Part-time / full-time     109601.789715
+Name: SALARY, dtype: float64
+
+ State with the Most Job Postings: Texas</code></pre>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,13 +1,105 @@
 ---
 title: "Job Postings Data Analysis"
 author: "Ling Lu"
+jupyter: python3
 format: html
 execute:
   echo: true
 ---
 
 ```{python}
-import pandas as pd    # Data manipulation
-import numpy as np     # Numerical computations
-import matplotlib.pyplot as plt  # Plotting
-import seaborn as sns  # Statistical visualization
+import pandas as pd
+import gdown
+import zipfile
+
+df = pd.read_csv('lightcast_job_postings.csv')
+
+pd.set_option("display.max_columns", None)  # Show all columns
+pd.set_option("display.max_colwidth", 50) 
+
+df.info()
+df.head()
+```
+
+```{python}
+
+# Step 3: Data Cleaning and Preprocessing
+
+# Create a copy to prevent chained assignment warning
+df = df.copy()
+
+# Remove duplicates
+df = df.drop_duplicates()
+
+# Handle missing values safely
+if "DURATION" in df.columns:
+    df["DURATION"] = df["DURATION"].fillna(df["DURATION"].median())
+
+salary_columns = ["SALARY"]
+
+# Replace missing salary values with the median salary for each column
+for col in salary_columns:
+    if col in df.columns:
+        df[col] = df[col].fillna(df[col].median())
+
+# Convert date columns to datetime format
+date_columns = ["LAST_UPDATED_DATE", "POSTED", "EXPIRED"]
+for col in date_columns:
+    if col in df.columns:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
+
+# Clean text columns
+list_columns = ["SOURCES", "SOURCE_TYPES", "URL","EDUCATION_LEVELS_NAME","EDUCATION_LEVELS","LOCATION","SKILLS","SKILLS_NAME","SPECIALIZED_SKILLS","SPECIALIZED_SKILLS_NAME","COMMON_SKILLS",
+"COMMON_SKILLS_NAME","SOFTWARE_SKILLS","SOFTWARE_SKILLS_NAME","CIP6","CIP6_NAME","CIP4","CIP4_NAME","CIP2","CIP2_NAME"]
+for col in list_columns:
+    if col in df.columns:
+        df[col] = df[col].astype(str).str.replace(r"[\[\]\n\"]", "", regex=True).str.strip()
+
+# Save the cleaned dataset
+cleaned_file = "cleaned_lightcast_job_postings.csv"
+df.to_csv(cleaned_file, index=False)
+print(f"\n Cleaned dataset saved as '{cleaned_file}'")
+
+df.head() 
+
+
+```
+
+
+```{python}
+
+
+#  Step 4: Exploratory Data Analysis (EDA)
+
+# 4.1 Count Total Job Postings
+total_postings = df.shape[0]
+print(f"\n Total Job Postings: {total_postings}")
+
+# 4.2 Find Top 5 Job Titles
+if "TITLE_NAME" in df.columns:
+    top_job_titles = df["TITLE_NAME"].value_counts().head(5)
+    print("\n Top 5 Most Common Job Titles:")
+    print(top_job_titles)
+else:
+    print("\n 'TITLE_NAME' column is missing.")
+
+# 4.3 Calculate Average Salary by Employment Type
+# Calculate Average Salary by Employment Type
+if "EMPLOYMENT_TYPE_NAME" in df.columns and "SALARY" in df.columns:
+    avg_salary_by_type = df.groupby("EMPLOYMENT_TYPE_NAME")["SALARY"].mean()
+    print("\n Average Salary by Employment Type:")
+    print(avg_salary_by_type)
+else:
+    print("\n 'SALARY' or 'EMPLOYMENT_TYPE_NAME' column is missing.")
+
+
+# 4.4 Find the State with the Most Job Postings
+if "STATE_NAME" in df.columns:
+    top_state = df["STATE_NAME"].value_counts().idxmax()
+    print(f"\n State with the Most Job Postings: {top_state}")
+else:
+    print("\n 'STATE_NAME' column is missing.")
+
+```
+
+
